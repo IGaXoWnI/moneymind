@@ -31,14 +31,20 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'monthly_salary' => ['required', 'numeric', 'min:0'],
+            'salary_credit_date' => ['required', 'integer', 'min:1', 'max:31'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'monthly_salary' => $request->monthly_salary,
+            'salary_credit_date' => $request->salary_credit_date,
+            'role' => 'user',
+
         ]);
 
         event(new Registered($user));

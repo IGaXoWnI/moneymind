@@ -12,6 +12,23 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+
+    public function savingGoals()
+    {
+        return $this->hasMany(SavingGoal::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,6 +38,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'monthly_salary',
+        'salary_credit_date',
+        'role',
     ];
 
     /**

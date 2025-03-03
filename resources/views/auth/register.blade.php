@@ -15,6 +15,19 @@
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
+          <!-- Monthly Salary -->
+          <div class="mt-4">
+            <x-input-label for="monthly_salary" :value="__('Monthly Salary (DH)')" />
+            <x-text-input id="monthly_salary" class="block mt-1 w-full" type="number" name="monthly_salary" :value="old('monthly_salary')" required step="0.01" min="0" />
+            <x-input-error :messages="$errors->get('monthly_salary')" class="mt-2" />
+        </div>
+
+        <!-- Salary Credit Date -->
+        <div class="mt-4">
+            <x-input-label for="salary_credit_date" :value="__('Salary Credit Date (Day of month)')" />
+            <x-text-input id="salary_credit_date" class="block mt-1 w-full" type="number" name="salary_credit_date" :value="old('salary_credit_date')" required min="1" max="31" />
+            <x-input-error :messages="$errors->get('salary_credit_date')" class="mt-2" />
+        </div>
 
         <!-- Password -->
         <div class="mt-4">
