@@ -1,5 +1,5 @@
 @php
-    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Auth as AuthFacade;
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -7,494 +7,447 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoneyMind Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f5f8fa;
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        
+        .top-gradient {
+            background: linear-gradient(90deg, #13314E, #235789);
         }
         
         .progress-bar {
-            height: 0.5rem;
-            border-radius: 0.25rem;
-            background-color: #e5e7eb;
+            height: 6px;
+            border-radius: 6px;
+            background-color: rgba(229, 231, 235, 0.5);
             overflow: hidden;
         }
         
         .progress-bar-fill {
             height: 100%;
-            border-radius: 0.25rem;
+            border-radius: 6px;
             transition: width 0.5s ease;
         }
         
         .card {
+            border-radius: 16px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: white;
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .suggestion-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
         
         .budget-card {
-            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            background: linear-gradient(135deg, #13314E 0%, #235789 100%);
+            color: white;
         }
         
         .expense-card {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+            color: white;
         }
         
-        .income-bar {
-            background: linear-gradient(90deg, #84fab0 0%, #8fd3f4 100%);
-        }
-        
-        .expense-bar {
-            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
-        }
-        
-        .category-item:hover {
-            background-color: #f3f4f6;
-        }
-        
-        .wishlist-progress-fill {
-            background: linear-gradient(90deg, #a78bfa 0%, #818cf8 100%);
-        }
-        
-        .goal-progress-fill {
-            background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
-        }
-        
-        .light-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        .suggestion-card {
+            background: linear-gradient(135deg, #FFDE5A 0%, #FFD54F 100%);
+            color: #13314E;
         }
         
         .nav-item {
-            transition: all 0.3s ease;
+            position: relative;
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
         
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .active-nav {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid white;
-        }
-        
-        .bg-indigo-600 {
-            background-color: #FFDE5A;
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(19, 49, 78, 0.05);
             color: #13314E;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease;
         }
         
-        .bg-indigo-600:hover {
-            background-color: #FFD54F;
-        }
-        
-        .text-gray-800 {
+        .nav-item.active {
             font-weight: 600;
         }
         
-        .text-sm {
-            font-size: 0.875rem;
+        .nav-item.active:before {
+            content: "";
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 60%;
+            width: 3px;
+            background-color: #13314E;
+            border-radius: 0 3px 3px 0;
+        }
+        
+        .btn-primary {
+            background-color: #13314E;
+            color: white;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0c253d;
+        }
+        
+        .btn-secondary {
+            background-color: #FFDE5A;
+            color: #13314E;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #ffd321;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .transaction-item {
+            border-radius: 12px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .transaction-item:hover {
+            background-color: rgba(243, 244, 246, 0.8);
         }
     </style>
 </head>
-<body>
-    <!-- Main Layout -->
+<body x-data="{ sidebarOpen: false }">
     <div class="flex min-h-screen">
+        <!-- Mobile sidebar backdrop -->
+        <div 
+            x-show="sidebarOpen" 
+            @click="sidebarOpen = false" 
+            class="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        ></div>
+        
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg flex flex-col fixed h-full">
-            <div class="p-4 flex items-center space-x-3 border-b">
-                <h1 class="text-xl font-bold text-gray-800">MoneyMind</h1>
-            </div>
-            
-            <div class="mt-8 flex-1 flex flex-col">
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-tachometer-alt text-gray-600"></i>
-                    <span class="text-gray-800">Dashboard</span>
-                </a>
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-money-bill-wave text-gray-600"></i>
-                    <span class="text-gray-800">Expenses</span>
-                </a>
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-calendar-alt text-gray-600"></i>
-                    <span class="text-gray-800">Recurring</span>
-                </a>
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-bullseye text-gray-600"></i>
-                    <span class="text-gray-800">Goals</span>
-                </a>
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-star text-gray-600"></i>
-                    <span class="text-gray-800">Wishlist</span>
-                </a>
-                <a href="#" class="nav-item flex items-center space-x-3 px-6 py-3 hover:bg-gray-100 transition duration-200">
-                    <i class="fas fa-cog text-gray-600"></i>
-                    <span class="text-gray-800">Settings</span>
-                </a>
-            </div>
-            
-            <div class="p-4 mt-auto border-t">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <span class="font-semibold text-gray-800">SM</span>
-                    </div>
-                    <div>
-                        <h3 class="font-medium text-gray-800">Sarah Morin</h3>
-                        <p class="text-xs text-gray-500">Premium User</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <x-sidebar />
         
         <!-- Main Content -->
-        <div class="ml-64 flex-1">
+        <div class="flex-1 ml-64">
             <!-- Top Nav -->
-            <div class="bg-white py-3 px-6 flex justify-between items-center shadow-sm sticky top-0 z-10">
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-800">Dashboard Overview</h2>
-                    <p class="text-sm text-gray-500">Welcome back, Sarah!</p>
+            <div class="sticky top-0 z-10 glassmorphism">
+                <div class="top-gradient h-1.5"></div>
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <button @click="sidebarOpen = true" class="mr-4 text-gray-600 lg:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-800">Dashboard</h1>
+                            <p class="text-sm text-gray-500">Welcome back, {{ AuthFacade::user()->name ?? 'User' }}!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('expenses.create') }}" class="btn-secondary px-4 py-2 text-sm font-medium flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Expense
+                        </a>
+                        <div class="relative">
+                            <button class="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Budget Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="card overflow-hidden">
+                        <div class="budget-card p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <p class="text-opacity-90 text-sm">Remaining Budget</p>
+                                    <h3 class="text-3xl font-bold mt-1">{{ number_format((AuthFacade::user()->monthly_salary + AuthFacade::user()->budget) - $expenses->sum('amount'), 0) }} DH</h3>
+                                </div>
+                                <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                                    <i class="fas fa-wallet text-xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="w-full h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
+                                    @php
+                                        $budgetPercent = AuthFacade::user()->monthly_salary > 0 
+                                            ? 100 - (($expenses->sum('amount') / AuthFacade::user()->monthly_salary) * 100)
+                                            : 0;
+                                        $budgetPercent = max(0, min(100, $budgetPercent));
+                                    @endphp
+                                    <div class="h-full bg-white rounded-full" style="width: {{ $budgetPercent }}%;"></div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <p>{{ number_format($budgetPercent, 0) }}% remaining</p>
+                                    <p>{{ number_format(AuthFacade::user()->monthly_salary, 0) }} DH total</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 flex justify-between text-sm text-gray-500">
+                            <span>Monthly Budget</span>
+                            <span>Resets: {{ AuthFacade::user()->salary_credit_date ?? '1st' }} of month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card overflow-hidden">
+                        <div class="expense-card p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <p class="text-opacity-90 text-sm">Total Spent</p>
+                                    <h3 class="text-3xl font-bold mt-1">{{ number_format($expenses->sum('amount'), 0) }} DH</h3>
+                                </div>
+                                <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                                    <i class="fas fa-receipt text-xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="w-full h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
+                                    @php
+                                        $spentPercent = AuthFacade::user()->monthly_salary > 0 
+                                            ? ($expenses->sum('amount') / AuthFacade::user()->monthly_salary) * 100
+                                            : 0;
+                                        $spentPercent = max(0, min(100, $spentPercent));
+                                    @endphp
+                                    <div class="h-full bg-white rounded-full" style="width: {{ $spentPercent }}%;"></div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-sm">
+                                    <p>{{ number_format($spentPercent, 0) }}% of budget</p>
+                                    <p>{{ $expenses->count() }} transactions</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 flex justify-between text-sm text-gray-500">
+                            <span>This Month</span>
+                            <span>Last update: Today</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card overflow-hidden">
+                        <div class="suggestion-card p-6">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <p class="text-opacity-90 text-sm">AI Suggestion</p>
+                                    <h3 class="text-xl font-semibold mt-1 leading-tight">Consider reducing your entertainment expenses to reach your vacation goal faster.</h3>
+                                </div>
+                                <div class="bg-white bg-opacity-20 p-3 rounded-xl">
+                                    <i class="fas fa-lightbulb text-xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="bg-white bg-opacity-30 text-xs px-3 py-1 rounded-full font-medium">
+                                    Show me how
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex justify-between text-sm">
+                            <span class="text-gray-500">Based on your spending patterns</span>
+                            <span class="text-[#13314E] font-medium cursor-pointer">View more tips</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('expenses.create') }}" class="inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
-                        Add Expense
+                <!-- Main Content Section -->
+                <div class="card p-6 mb-8">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-bold text-gray-800">Recent Transactions</h3>
+        <div class="flex items-center space-x-2">
+            <div class="relative">
+                <select class="pl-3 pr-8 py-2 text-sm bg-gray-50 rounded-lg border-0 focus:ring-2 focus:ring-[#13314E] appearance-none">
+                    <option>All Categories</option>
+                    <option>Food & Dining</option>
+                    <option>Transportation</option>
+                    <option>Entertainment</option>
+                    <option>Bills & Utilities</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                </div>
+            </div>
+            <button class="btn-primary px-4 py-2 text-sm">
+                <i class="fas fa-filter mr-1"></i> Filter
+            </button>
+        </div>
+    </div>
+    
+    <div class="space-y-3">
+        @forelse($expenses as $expense)
+        <div class="transaction-item p-4 border border-gray-100 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center mr-4
+                    @if(strpos(strtolower($expense->name), 'food') !== false || strpos(strtolower($expense->description), 'food') !== false)
+                        bg-green-100 text-green-600
+                    @elseif(strpos(strtolower($expense->name), 'bill') !== false || strpos(strtolower($expense->description), 'bill') !== false)
+                        bg-blue-100 text-blue-600
+                    @elseif(strpos(strtolower($expense->name), 'transport') !== false || strpos(strtolower($expense->description), 'transport') !== false)
+                        bg-yellow-100 text-yellow-600
+                    @elseif(strpos(strtolower($expense->name), 'entertainment') !== false || strpos(strtolower($expense->description), 'entertainment') !== false)
+                        bg-purple-100 text-purple-600
+                    @else
+                        bg-gray-100 text-gray-600
+                    @endif
+                ">
+                    <i class="
+                    @if(strpos(strtolower($expense->name), 'food') !== false || strpos(strtolower($expense->description), 'food') !== false)
+                        fas fa-utensils
+                    @elseif(strpos(strtolower($expense->name), 'bill') !== false || strpos(strtolower($expense->description), 'bill') !== false)
+                        fas fa-file-invoice
+                    @elseif(strpos(strtolower($expense->name), 'transport') !== false || strpos(strtolower($expense->description), 'transport') !== false)
+                        fas fa-car
+                    @elseif(strpos(strtolower($expense->name), 'entertainment') !== false || strpos(strtolower($expense->description), 'entertainment') !== false)
+                        fas fa-film
+                    @else
+                        fas fa-shopping-bag
+                    @endif
+                    "></i>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-800">{{ $expense->name }}</h4>
+                    <p class="text-sm text-gray-500">{{ $expense->description }}</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center">
+                <div class="text-right mr-4">
+                    <span class="font-semibold text-red-500 block">- {{ number_format($expense->amount, 0) }} DH</span>
+                    <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($expense->date)->format('d M Y') }}</p>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <a href="{{ route('expenses.edit', $expense->id) }}" class="h-8 w-8 bg-gray-50 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors duration-150" title="Edit">
+                        <i class="fas fa-pencil-alt text-[#13314E] text-sm"></i>
                     </a>
-                    <button class="rounded-full bg-gray-100 p-2">
-                        <i class="fas fa-bell text-gray-500"></i>
-                    </button>
-                    <button class="rounded-full bg-gray-100 p-2">
-                        <i class="fas fa-question-circle text-gray-500"></i>
-                    </button>
-                    <form method="POST" action="{{ route('logout') }}">
+                    
+                    <form method="POST" action="{{ route('expenses.destroy', $expense->id) }}" class="inline">
                         @csrf
-                        <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition duration-300">
-                            {{ __('Log Out') }}
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this expense?')" class="h-8 w-8 bg-gray-50 hover:bg-red-50 rounded-lg flex items-center justify-center transition-colors duration-150" title="Delete">
+                            <i class="fas fa-trash-alt text-red-500 text-sm"></i>
                         </button>
                     </form>
                 </div>
             </div>
-            
-
-            
-            <!-- Dashboard Content -->
-            <div class="p-6 bg-gray-50">
-                <!-- Budget Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="card rounded-xl overflow-hidden">
-                        <div class="budget-card p-6 text-white">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-white text-opacity-80">Remaining Budget</p>
-                                    <h3 class="text-3xl font-bold mt-1">{{ Auth::user()->monthly_salary - $expenses->sum('amount') }} DH</h3>
-                                </div>
-                                <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                    <i class="fas fa-wallet text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <div class="w-full h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-white rounded-full" style="width: 65%;"></div>
-                                </div>
-                                <p class="text-sm mt-2 text-white text-opacity-80">65% of budget remaining</p>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4">
-                            <div class="flex justify-between text-sm text-gray-500">
-                                <span>Monthly Budget: {{ Auth::user()->monthly_salary }} DH</span>
-                                <span>Next Reset: {{ Auth::user()->salary_credit_date }} Mar</span>
-                            </div>
+        </div>
+        @empty
+        <div class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                <i class="fas fa-receipt text-gray-400 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800 mb-1">No transactions yet</h3>
+            <p class="text-gray-500 mb-4">Start tracking your expenses to see them here</p>
+            <a href="{{ route('expenses.create') }}" class="btn-primary px-5 py-2 inline-block">Add Your First Expense</a>
+        </div>
+        @endforelse
+    </div>
+    
+    @if($expenses->count() > 0)
+    <div class="mt-6 text-center">
+        <button class="btn-primary px-6 py-2.5">View All Transactions</button>
+    </div>
+    @endif
+</div>
+                
+                <!-- Additional Features Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-5">Weekly Spending Overview</h3>
+                        <div class="h-64">
+                            <canvas id="weeklySpendingChart"></canvas>
                         </div>
                     </div>
                     
-                    <div class="card rounded-xl overflow-hidden">
-                        <div class="expense-card p-6 text-white">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-white text-opacity-80">Total Spent</p>
-                                    <h3 class="text-3xl font-bold mt-1">{{ $expenses->sum('amount')   }} DH</h3>
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-5">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="#" class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                                <div class="flex flex-col items-center text-center">
+                                    <div class="h-12 w-12 rounded-full bg-[#13314E] text-white flex items-center justify-center mb-3">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-800">Add Expense</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Track new spending</p>
                                 </div>
-                                <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                    <i class="fas fa-money-bill-wave text-xl"></i>
+                            </a>
+                            
+                            <a href="#" class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                                <div class="flex flex-col items-center text-center">
+                                    <div class="h-12 w-12 rounded-full bg-[#FFDE5A] text-[#13314E] flex items-center justify-center mb-3">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-800">Analytics</h4>
+                                    <p class="text-xs text-gray-500 mt-1">View detailed reports</p>
                                 </div>
-                            </div>
-                            <div class="mt-4">
-                                <div class="w-full h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
-                                    <div class="h-full bg-white rounded-full" style="width: 35%;"></div>
+                            </a>
+                            
+                            <a href="#" class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                                <div class="flex flex-col items-center text-center">
+                                    <div class="h-12 w-12 rounded-full bg-green-500 text-white flex items-center justify-center mb-3">
+                                        <i class="fas fa-bullseye"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-800">Set Goal</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Plan your savings</p>
                                 </div>
-                                <p class="text-sm mt-2 text-white text-opacity-80">35% of budget spent</p>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4">
-                            <div class="flex justify-between text-sm text-gray-500">
-                                <span>This Month: +12%</span>
-                                <span>Last Update: Today</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card rounded-xl overflow-hidden">
-                        <div class="suggestion-card p-6 text-white">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="text-white text-opacity-80">AI Suggestion</p>
-                                    <h3 class="text-xl font-medium mt-2 leading-tight">Consider reducing your divertissement expenses to reach your vacation goal faster.</h3>
+                            </a>
+                            
+                            <a href="#" class="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                                <div class="flex flex-col items-center text-center">
+                                    <div class="h-12 w-12 rounded-full bg-purple-500 text-white flex items-center justify-center mb-3">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-800">Recurring</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Manage subscriptions</p>
                                 </div>
-                                <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                    <i class="fas fa-robot text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Based on your spending habits</span>
-                                <span class="text-indigo-600 font-medium cursor-pointer">More Tips</span>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Main Dashboard Sections -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left Column - Expense Categories -->
-                    <!-- <div class="lg:col-span-2">
-                        <div class="light-card p-6 mb-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800">Expense Breakdown</h3>
-                                <div class="flex items-center space-x-2">
-                                    <select class="text-sm px-3 py-1.5 bg-gray-100 rounded-md border-0 focus:ring-2 focus:ring-indigo-500">
-                                        <option>February 2025</option>
-                                        <option>January 2025</option>
-                                        <option>December 2024</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <div class="h-64 relative">
-                                        <canvas id="categoryChart"></canvas>
-                                    </div>
-                                </div>
-                                
-                                <div class="space-y-4">
-                                    <div class="category-item flex items-center p-3 rounded-lg hover:cursor-pointer">
-                                        <div class="w-3 h-3 rounded-full bg-blue-500 mr-4"></div>
-                                        <div class="flex-1">
-                                            <div class="flex justify-between mb-1">
-                                                <h4 class="font-medium">Divertissement</h4>
-                                                <span class="font-semibold">600 DH</span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div class="progress-bar-fill" style="width: 35%; background-color: #3b82f6;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="category-item flex items-center p-3 rounded-lg hover:cursor-pointer">
-                                        <div class="w-3 h-3 rounded-full bg-red-500 mr-4"></div>
-                                        <div class="flex-1">
-                                            <div class="flex justify-between mb-1">
-                                                <h4 class="font-medium">Factures</h4>
-                                                <span class="font-semibold">510 DH</span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div class="progress-bar-fill" style="width: 30%; background-color: #ef4444;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="category-item flex items-center p-3 rounded-lg hover:cursor-pointer">
-                                        <div class="w-3 h-3 rounded-full bg-green-500 mr-4"></div>
-                                        <div class="flex-1">
-                                            <div class="flex justify-between mb-1">
-                                                <h4 class="font-medium">Nourriture</h4>
-                                                <span class="font-semibold">425 DH</span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div class="progress-bar-fill" style="width: 25%; background-color: #10b981;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="category-item flex items-center p-3 rounded-lg hover:cursor-pointer">
-                                        <div class="w-3 h-3 rounded-full bg-yellow-500 mr-4"></div>
-                                        <div class="flex-1">
-                                            <div class="flex justify-between mb-1">
-                                                <h4 class="font-medium">Transport</h4>
-                                                <span class="font-semibold">215 DH</span>
-                                            </div>
-                                            <div class="progress-bar">
-                                                <div class="progress-bar-fill" style="width: 10%; background-color: #f59e0b;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 text-center">
-                                <button class="text-indigo-600 font-medium hover:underline">View All Categories</button>
-                            </div>
-                        </div> -->
-                        
-                        <!-- Recent Transactions -->
-                        <div class="light-card p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
-                                <button class="text-indigo-600 font-medium hover:underline">View All</button>
-                            </div>
-                            
-                            <div class="space-y-4">
-                                @foreach($expenses as $expense)
-                                <div class="flex items-center p-3 bg-white border border-gray-100 rounded-lg">
-                                    <div class="flex-1">
-                                        <div class="flex justify-between">
-                                            <div>
-                                                <h4 class="font-medium">{{ $expense->name }}</h4>
-                                                <p class="text-sm text-gray-500">{{ $expense->description }}</p>
-                                            </div>
-                                            <div class="text-right">
-                                                <span class="font-semibold text-red-500">-{{ $expense->amount }} DH</span>
-                                                <p class="text-xs text-gray-500">{{ $expense->date }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                                @endforeach
-                            </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="mt-8 py-6 border-t border-gray-100">
+                <div class="container mx-auto px-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div class="text-sm text-gray-500 mb-4 md:mb-0">
+                            © 2025 MoneyMind. All rights reserved.
                         </div>
-                    </div>
-                    
-                    <!-- Right Column - Goals & Wishlist -->
-                    <div class="space-y-6">
-                        <!-- Savings Goals -->
-                        <!-- <div class="light-card p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800">Savings Goals</h3>
-                                <button class="p-2 text-gray-500 hover:text-indigo-600">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="space-y-6">
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">Emergency Fund</h4>
-                                            <p class="text-sm text-gray-500">200 DH saved of 1,000 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">20%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="goal-progress-fill" style="width: 20%;"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">Vacation</h4>
-                                            <p class="text-sm text-gray-500">500 DH saved of 2,000 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">25%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="goal-progress-fill" style="width: 25%;"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">Education</h4>
-                                            <p class="text-sm text-gray-500">300 DH saved of 3,000 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">10%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="goal-progress-fill" style="width: 10%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 text-center">
-                                <button class="text-indigo-600 font-medium hover:underline">Manage Goals</button>
-                            </div>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Privacy Policy</a>
+                            <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Terms of Service</a>
+                            <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Contact Support</a>
                         </div>
-                         -->
-                        <!-- Wishlist -->
-                        <!-- <div class="light-card p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800">Wishlist</h3>
-                                <button class="p-2 text-gray-500 hover:text-indigo-600">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="space-y-6">
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">Casque Audio</h4>
-                                            <p class="text-sm text-gray-500">100 DH saved of 1,000 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">10%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="wishlist-progress-fill" style="width: 10%;"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">New Laptop</h4>
-                                            <p class="text-sm text-gray-500">2,000 DH saved of 10,000 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">20%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="wishlist-progress-fill" style="width: 20%;"></div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="flex justify-between mb-2">
-                                        <div>
-                                            <h4 class="font-medium">Smart Watch</h4>
-                                            <p class="text-sm text-gray-500">450 DH saved of 1,500 DH</p>
-                                        </div>
-                                        <span class="text-sm font-semibold text-gray-700">30%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="wishlist-progress-fill" style="width: 30%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-6 text-center">
-                                <button class="text-indigo-600 font-medium hover:underline">View All Items</button>
-                            </div>
-                        </div> -->
-                        
-                        <!-- Budget Timeline -->
-                        
                     </div>
                 </div>
             </div>
@@ -502,90 +455,74 @@
     </div>
 
     <script>
-        // Configure Category Chart
-        const categoryChart = new Chart(
-            document.getElementById('categoryChart'),
-            {
-                type: 'doughnut',
-                data: {
-                    labels: ['Divertissement', 'Factures', 'Nourriture', 'Transport'],
-                    datasets: [{
-                        data: [600, 510, 425, 215],
-                        backgroundColor: [
-                            '#3b82f6',
-                            '#ef4444',
-                            '#10b981',
-                            '#f59e0b'
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
+        // Weekly Spending Chart
+        const weeklySpendingCtx = document.getElementById('weeklySpendingChart').getContext('2d');
+        const weeklySpendingChart = new Chart(weeklySpendingCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Daily Spending',
+                    data: [150, 220, 180, 310, 280, 420, 190],
+                    backgroundColor: [
+                        'rgba(19, 49, 78, 0.7)',
+                        'rgba(19, 49, 78, 0.7)',
+                        'rgba(19, 49, 78, 0.7)',
+                        'rgba(19, 49, 78, 0.7)',
+                        'rgba(19, 49, 78, 0.7)',
+                        'rgba(255, 222, 90, 0.8)',
+                        'rgba(19, 49, 78, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(19, 49, 78, 1)',
+                        'rgba(19, 49, 78, 1)',
+                        'rgba(19, 49, 78, 1)',
+                        'rgba(19, 49, 78, 1)',
+                        'rgba(19, 49, 78, 1)',
+                        'rgba(255, 222, 90, 1)',
+                        'rgba(19, 49, 78, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.raw} DH`;
+                            }
+                        }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            display: false
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw} DH (${Math.round((context.raw / 1750) * 100)}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        );
-        
-        // Configure Timeline Chart
-        const timelineChart = new Chart(
-            document.getElementById('timelineChart'),
-            {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Spending',
-                        data: [400, 950, 1400, 1750],
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Budget Line',
-                        data: [1250, 2500, 3750, 5000],
-                        borderColor: '#3b82f6',
-                        borderDash: [5, 5],
-                        fill: false,
-                        tension: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + ' DH';
-                                }
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' DH';
                             }
                         }
                     },
-                    plugins: {
-                        legend: {
+                    x: {
+                        grid: {
                             display: false
                         }
                     }
                 }
             }
-        );
+        });
     </script>
 </body>
 </html>
+                

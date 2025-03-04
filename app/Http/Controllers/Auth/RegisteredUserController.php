@@ -35,6 +35,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'monthly_salary' => ['required', 'numeric', 'min:0'],
             'salary_credit_date' => ['required', 'integer', 'min:1', 'max:31'],
+            "budget" => ['required', 'numeric', 'min:0']
         ]);
 
         $user = User::create([
@@ -44,6 +45,7 @@ class RegisteredUserController extends Controller
             'monthly_salary' => $request->monthly_salary,
             'salary_credit_date' => $request->salary_credit_date,
             'role' => 'user',
+            'budget' => $request->budget,
 
         ]);
 

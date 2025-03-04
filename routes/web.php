@@ -17,9 +17,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
-
+Route::get('/expenses', [ExpenseController::class, 'show'])->name('expenses.index');
+Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
 Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
 
+Route::resource('expenses', ExpenseController::class);
 
+Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
 
 require __DIR__.'/auth.php';

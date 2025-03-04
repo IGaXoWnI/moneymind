@@ -4,11 +4,12 @@
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-xl mx-auto bg-white shadow-xl rounded-2xl border border-gray-100">
         <div class="bg-neutral-900 text-white p-6 rounded-t-2xl">
-            <h1 class="text-3xl font-bold tracking-tight">Add New Expense</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Update Expense</h1>
         </div>
         
-        <form method="POST" action="{{ route('expenses.store') }}" class="p-8 space-y-6">
+        <form method="POST" action="{{ route('expenses.update', $expense->id) }}" class="p-8 space-y-6">
             @csrf
+            @method('PUT')
             
             <div class="space-y-2">
                 <label for="name" class="block text-sm font-medium text-gray-700">Expense Name</label>
@@ -16,6 +17,7 @@
                     type="text" 
                     name="name" 
                     id="name" 
+                    value="{{ $expense->name }}"
                     required 
                     placeholder="Enter expense name" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 transition duration-200"
@@ -28,6 +30,7 @@
                     type="text" 
                     name="description" 
                     id="description" 
+                    value="{{ $expense->description }}"
                     required 
                     placeholder="Add a brief description" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 transition duration-200"
@@ -42,6 +45,7 @@
                         type="number" 
                         name="amount" 
                         id="amount" 
+                        value="{{ $expense->amount }}"
                         required 
                         step="0.01" 
                         min="0" 
@@ -61,7 +65,12 @@
                 >
                     <option value="">Select a category</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <option 
+                            value="{{ $category->id }}" 
+                            {{ $expense->category_id == $category->id ? 'selected' : '' }}
+                        >
+                            {{ $category->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -75,18 +84,21 @@
                     onchange="toggleNextDateInput()" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 transition duration-200"
                 >
-                    <option value="">Select an option</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
+                    <option value="yes" {{ $expense->is_fixed == 'yes' ? 'selected' : '' }}>Yes</option>
+                    <option value="no" {{ $expense->is_fixed == 'no' ? 'selected' : '' }}>No</option>
                 </select>
             </div>
 
-            <div id="next_date_container" class="space-y-2 hidden">
+            <div 
+                id="next_date_container" 
+                class="space-y-2 {{ $expense->is_fixed == 'yes' ? '' : 'hidden' }}"
+            >
                 <label for="next_date" class="block text-sm font-medium text-gray-700">Next Recurring Date</label>
                 <input 
                     type="date" 
                     name="next_date" 
                     id="next_date" 
+                    value="{{ $expense->next_date }}"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 transition duration-200"
                 >
             </div>
@@ -96,7 +108,7 @@
                     type="submit" 
                     class="w-full bg-neutral-900 text-white font-semibold py-3 rounded-lg hover:bg-neutral-800 transition duration-200 ease-in-out shadow-md"
                 >
-                    Add Expense
+                    Update Expense
                 </button>
             </div>
         </form>

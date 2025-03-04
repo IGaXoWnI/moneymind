@@ -41,6 +41,7 @@ class User extends Authenticatable
         'monthly_salary',
         'salary_credit_date',
         'role',
+        'budget',   
     ];
 
     /**

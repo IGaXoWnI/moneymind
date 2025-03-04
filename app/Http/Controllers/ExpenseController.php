@@ -17,7 +17,6 @@ class ExpenseController extends Controller
             'description' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'date' => 'required|date',
             'is_fixed' => 'required|in:yes,no',
             'next_date' => 'nullable|date',
         ]);
@@ -28,7 +27,6 @@ class ExpenseController extends Controller
             'description' => $validated['description'],
             'amount' => $validated['amount'],
             'category_id' => $validated['category_id'],
-            'date' => $validated['date'],
             'next_date' => $validated['is_fixed'] === 'yes' ? $validated['next_date'] : null,
         ]);
     
@@ -42,7 +40,6 @@ class ExpenseController extends Controller
             'description' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'date' => 'required|date',
         ]);
 
         $expense = Expense::findOrFail($id);
@@ -50,7 +47,6 @@ class ExpenseController extends Controller
         $expense->description = $request->description;
         $expense->amount = $request->amount;
         $expense->category_id = $request->category_id;
-        $expense->date = $request->date;
         $expense->save();
 
         return redirect()->route('dashboard')->with('status', 'Expense updated successfully!');
@@ -70,9 +66,22 @@ class ExpenseController extends Controller
         return view('dashboard', compact('expenses'));
     }
 
+    public function show()
+    {
+        $expenses = Expense::where('user_id', Auth::id())->paginate(10);
+        return view('dashboard', compact('expenses'));
+    }   
+
     public function create()
     {
         $categories = Category::all(); // Fetch all categories
         return view('expenses.create', compact('categories')); // Pass categories to the view
+    }
+
+    public function edit($id)
+    {
+        $expense = Expense::findOrFail($id);
+        $categories = Category::all(); // Fetch all categories
+        return view('expenses.edit', compact('expense', 'categories')); // Pass expense and categories to the view
     }
 }
