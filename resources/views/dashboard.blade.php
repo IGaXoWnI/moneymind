@@ -192,7 +192,7 @@
                             <div class="flex justify-between items-start mb-6">
                                 <div>
                                     <p class="text-opacity-90 text-sm">Remaining Budget</p>
-                                    <h3 class="text-3xl font-bold mt-1">{{ number_format((AuthFacade::user()->monthly_salary + AuthFacade::user()->budget) - $expenses->sum('amount'), 0) }} DH</h3>
+                                    <h3 class="text-3xl font-bold mt-1">{{ (AuthFacade::user()->budget )}} DH</h3>
                                 </div>
                                 <div class="bg-white bg-opacity-20 p-3 rounded-xl">
                                     <i class="fas fa-wallet text-xl"></i>

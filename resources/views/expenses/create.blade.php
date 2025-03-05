@@ -84,7 +84,7 @@
             <div id="next_date_container" class="space-y-2 hidden">
                 <label for="next_date" class="block text-sm font-medium text-gray-700">Next Recurring Date</label>
                 <input 
-                    type="date" 
+                    type="number" 
                     name="next_date" 
                     id="next_date" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 transition duration-200"

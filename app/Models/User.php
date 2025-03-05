@@ -13,6 +13,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
 
+
+
     public function expenses()
     {
         return $this->hasMany(Expense::class);
@@ -29,6 +31,13 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    public function cutExpenses($montant)
+    {
+        $this->budget -= $montant;
+        $this->save();
+    }
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -41,7 +50,8 @@ class User extends Authenticatable
         'monthly_salary',
         'salary_credit_date',
         'role',
-        'budget',   
+        'budget',
+        'total',
     ];
 
     /**

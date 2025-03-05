@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Expense; // Make sure to create this model
-use App\Models\Category; // Make sure to create this model
+use App\Models\Expense;
+use App\Models\Category;
 
 class ExpenseController extends Controller
 {
+
 
     public function store(Request $request)
     {
@@ -17,19 +19,25 @@ class ExpenseController extends Controller
             'description' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'is_fixed' => 'required|in:yes,no',
-            'next_date' => 'nullable|date',
+            'is_fixed' => 'required',
+            'next_date' => 'nullable|int',
         ]);
-    
+
+        if ($request->input("is_fixed") === 'no') {
+            $user = User::find(Auth::id());
+            $user->cutExpenses($request->amount);
+        }
+
         Expense::create([
-            'user_id' => Auth::id(), // This should not be null if the user is authenticated
+            'user_id' => Auth::id(),
             'name' => $validated['name'],
             'description' => $validated['description'],
             'amount' => $validated['amount'],
             'category_id' => $validated['category_id'],
+            'is_fixed' => $validated['is_fixed'],
             'next_date' => $validated['is_fixed'] === 'yes' ? $validated['next_date'] : null,
         ]);
-    
+
         return redirect()->route('dashboard')->with('status', 'Expense added successfully!');
     }
 
@@ -70,7 +78,7 @@ class ExpenseController extends Controller
     {
         $expenses = Expense::where('user_id', Auth::id())->paginate(10);
         return view('dashboard', compact('expenses'));
-    }   
+    }
 
     public function create()
     {
