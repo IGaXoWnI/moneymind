@@ -34,7 +34,7 @@ class Subscription extends Command
         $expenses = Expense::where('is_fixed', 'yes')->where("next_date", $today)->with("user")->get();
 
         foreach ($expenses as $expense) {
-            $expense->user->monthly_salary  -= $expense->amount;
+            $expense->user->budget  -= $expense->amount;
             $expense->user->save();
             $this->info("Expense of " . $expense->amount . " for " . $expense->name . " has been deducted from " . $expense->user->name . " account");
         }

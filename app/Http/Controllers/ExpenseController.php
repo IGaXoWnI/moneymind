@@ -12,6 +12,7 @@ class ExpenseController extends Controller
 {
 
 
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -68,28 +69,44 @@ class ExpenseController extends Controller
         return redirect()->route('dashboard')->with('status', 'Expense deleted successfully!');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $expenses = Expense::where('user_id', Auth::id())->get();
-        return view('dashboard', compact('expenses'));
+        $expenses = Expense::with('category')->paginate(10);
+        
+        $categories = Category::all();
+
+        $totalAmount = $expenses->sum('amount'); 
+
+        $monthlyAverage = $expenses->count() > 0 ? $totalAmount / $expenses->count() : 0;
+
+        $highestExpense = $expenses->max('amount'); 
+
+        return view('expenses.index', compact('expenses', 'categories', 'totalAmount', 'monthlyAverage', 'highestExpense'));
     }
 
     public function show()
     {
         $expenses = Expense::where('user_id', Auth::id())->paginate(10);
-        return view('dashboard', compact('expenses'));
+        return view('expenses.index', compact('expenses'));
     }
 
     public function create()
     {
-        $categories = Category::all(); // Fetch all categories
-        return view('expenses.create', compact('categories')); // Pass categories to the view
+        $categories = Category::all();
+        return view('expenses.create', compact('categories'));
     }
 
     public function edit($id)
     {
         $expense = Expense::findOrFail($id);
-        $categories = Category::all(); // Fetch all categories
-        return view('expenses.edit', compact('expense', 'categories')); // Pass expense and categories to the view
+        $categories = Category::all(); 
+        return view('expenses.edit', compact('expense', 'categories')); 
+    }
+
+    public function dashboard()
+    {
+        $expenses = Expense::where('user_id', Auth::id())->get(); 
+
+        return view('dashboard', compact('expenses'));
     }
 }

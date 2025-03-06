@@ -21,9 +21,9 @@ class User extends Authenticatable
     }
 
 
-    public function savingGoals()
+    public function savings()
     {
-        return $this->hasMany(SavingGoal::class);
+        return $this->hasOne(Saving::class);
     }
 
     public function notifications()
