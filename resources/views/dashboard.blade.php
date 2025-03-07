@@ -260,7 +260,7 @@
                             <div class="flex justify-between items-start mb-6">
                                 <div>
                                     <p class="text-opacity-90 text-sm">AI Suggestion</p>
-                                    <h3 class="text-xl font-semibold mt-1 leading-tight">Consider reducing your entertainment expenses to reach your vacation goal faster.</h3>
+                                    <h3 class="text-xl font-semibold mt-1 leading-tight">{{ $aiSuggestion }}</h3>
                                 </div>
                                 <div class="bg-white bg-opacity-20 p-3 rounded-xl">
                                     <i class="fas fa-lightbulb text-xl"></i>

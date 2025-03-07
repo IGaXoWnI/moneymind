@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\WishListController;
+use App\Http\Controllers\AIController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,10 +46,12 @@ Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expe
 
 Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
 
-// Route for storing saving goals
 Route::post('/saving-goals', [SavingController::class, 'store'])->name('saving-goals.store');
 Route::put('/saving-goals/{id}', [SavingController::class, 'update'])->name('saving-goals.update');
 Route::post('/saving-goals/{id}/add-extra-contribution', [SavingController::class, 'addExtraContribution'])->name('saving-goals.add-extra-contribution');
+
+
+Route::post("/generate-text" , [AIController::class, 'generateText']);
 
 
 require __DIR__.'/auth.php';

@@ -10,8 +10,11 @@ use App\Models\Category;
 
 class ExpenseController extends Controller
 {
+    protected $aiController;
 
-
+    public function __construct(AIController $aiController ){
+        $this->aiController = $aiController;
+    }
 
     public function store(Request $request)
     {
@@ -106,7 +109,8 @@ class ExpenseController extends Controller
     public function dashboard()
     {
         $expenses = Expense::where('user_id', Auth::id())->get(); 
+        $aiSuggestion = $this->aiController->generateText();
 
-        return view('dashboard', compact('expenses'));
+        return view('dashboard', compact('expenses' , 'aiSuggestion'));
     }
 }
