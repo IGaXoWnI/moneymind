@@ -29,9 +29,9 @@ class salaireUpdate extends Command
     public function handle()
     {
         $today = Carbon::now()->day;
-        logger($today);
+
         $users = User::where("salary_credit_date", $today)->get();
-        logger($users);
+
 
         foreach ($users as $user) {
             $user->monthly_salary += $user->monthly_salary;

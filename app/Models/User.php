@@ -36,6 +36,9 @@ class User extends Authenticatable
         $this->budget -= $montant;
         $this->save();
     }
+    public function wishlists(){
+        return $this->hasMany(Wishlist::class);
+    }
 
 
     /**

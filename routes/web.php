@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SavingController;
+use App\Http\Controllers\WishListController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,9 +21,12 @@ Route::get('/recurring', function () {
 
 Route::get('/goals', [SavingController::class, 'index'])->name('goals.index');
 
-Route::get('/wishlist', function () {
-    return view('wishlist');
-})->name('wishlist');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wishlist', [WishListController::class, 'index'])->name('wishlist');
+    Route::post('/wishlist', [WishListController::class, 'store'])->name('wishlist.store');
+    Route::post('/wishlist/contribute', [WishListController::class, 'contribute'])->name('wishlist.contribute');
+    Route::post('/wishlist/complete', [WishListController::class, 'complete'])->name('wishlist.complete');
+});
 
 
 
