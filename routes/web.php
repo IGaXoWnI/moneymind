@@ -6,6 +6,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\WishListController;
 use App\Http\Controllers\AIController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,7 +52,14 @@ Route::put('/saving-goals/{id}', [SavingController::class, 'update'])->name('sav
 Route::post('/saving-goals/{id}/add-extra-contribution', [SavingController::class, 'addExtraContribution'])->name('saving-goals.add-extra-contribution');
 
 
-Route::post("/generate-text" , [AIController::class, 'generateText']);
+Route::post("/generate-text", [AIController::class, 'generateText']);
 
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::post('/admin/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+    Route::put('/admin/categories/{category}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+    Route::delete('/admin/categories/{category}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
+    Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+});
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\SubscriptionDeductedMail;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Expense;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class Subscription extends Command
 {
@@ -21,14 +23,13 @@ class Subscription extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Process subscriptions and send notifications';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-
         $today = Carbon::now()->day;
 
         $expenses = Expense::where('is_fixed', 'yes')->where("next_date", $today)->with("user")->get();
@@ -36,7 +37,10 @@ class Subscription extends Command
         foreach ($expenses as $expense) {
             $expense->user->budget  -= $expense->amount;
             $expense->user->save();
-            $this->info("Expense of " . $expense->amount . " for " . $expense->name . " has been deducted from " . $expense->user->name . " account");
+
+            // Send email notification
+            Mail::to($expense->user->email)->send(new SubscriptionDeductedMail($expense));
+            $this->info("Expense processed and email sent to {$expense->user->email}");
         }
-    }   
+    }
 }

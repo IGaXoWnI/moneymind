@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\SavingDeductedMail;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Mail;
 
 class Saving extends Command
 {
@@ -21,7 +22,7 @@ class Saving extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Process savings and send notification';
 
     /**
      * Execute the console command.
@@ -31,17 +32,17 @@ class Saving extends Command
         $users = User::with('savings')->get();
         $today = Carbon::now()->day;
 
-
         foreach ($users as $user) {
             $saving_cut_day = $user->salary_credit_date - 1;
-           
-    
+
             if ($today === $saving_cut_day) {
-                
-                $user->budget -= $user->savings->monthly_contribution;
+                $amount = $user->savings->monthly_contribution;
+                $user->budget -= $amount;
                 $user->save();
-            
-  
+
+                // Send email notification
+                Mail::to($user->email)->send(new SavingDeductedMail($amount));
+                $this->info("Saving deducted and email sent to {$user->email}");
             }
         }
     }

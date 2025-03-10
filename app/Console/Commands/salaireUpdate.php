@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\SalaryUpdatedMail;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
-
+use Illuminate\Support\Facades\Mail;
 
 class salaireUpdate extends Command
 {
@@ -21,7 +22,7 @@ class salaireUpdate extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Update user salaries and send notification';
 
     /**
      * Execute the console command.
@@ -32,10 +33,13 @@ class salaireUpdate extends Command
 
         $users = User::where("salary_credit_date", $today)->get();
 
-
         foreach ($users as $user) {
             $user->monthly_salary += $user->monthly_salary;
             $user->save();
+
+            // Send email notification
+            Mail::to($user->email)->send(new SalaryUpdatedMail($user->monthly_salary));
+            $this->info("Salary updated and email sent to {$user->email}");
         }
     }
 }
