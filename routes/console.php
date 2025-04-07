@@ -17,4 +17,3 @@ Schedule::command(salaireUpdate::class)->daily();
 Schedule::command(subscription::class)->daily();
 Schedule::command(Saving::class)->daily();
 Schedule::command(wishlist::class)->daily();
-
